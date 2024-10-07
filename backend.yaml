@@ -1,0 +1,53 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: Plantilla de CloudFormation para el Backend en Node.js/TypeScript
+
+Resources:
+  # Bucket S3 para el código del backend
+  BackendCodeBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: your-backend-code-bucket
+      AccessControl: Private
+
+  # Rol de ejecución para Lambda
+  LambdaExecutionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: lambda.amazonaws.com
+            Action: sts:AssumeRole
+      Policies:
+        - PolicyName: LambdaS3Access
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - s3:GetObject
+                  - s3:PutObject
+                Resource: !Sub 'arn:aws:s3:::${BackendCodeBucket}/*'
+
+  # Función Lambda para el backend
+  BackendLambdaFunction:
+    Type: AWS::Lambda::Function
+    Properties:
+      FunctionName: BackendLambda
+      Handler: dist/index.handler  # Cambia esto según tu archivo de entrada
+      Role: !GetAtt LambdaExecutionRole.Arn
+      Runtime: nodejs18.x
+      Code:
+        S3Bucket: !Ref BackendCodeBucket
+        S3Key: path/to/your/backend-code.zip  # Cambia esto según la ruta de tu código
+      MemorySize: 128
+      Timeout: 30
+
+  # API Gateway para el backend
+  BackendApi:
+    Type: AWS::ApiGateway::RestApi
+    Properties:
+      Name: BackendAPI
+      Description: API para el backend de BTG Pactual
