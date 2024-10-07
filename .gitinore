@@ -1,0 +1,23 @@
+# Dependencias de Node.js
+node_modules/
+
+# Archivos de compilación de TypeScript
+dist/
+build/
+
+# Archivos de configuración de IDE
+.vscode/
+.idea/
+
+# Archivos de entorno
+.env
+
+# Archivos de log
+*.log
+
+# Archivos de sistema
+.DS_Store
+Thumbs.db
+
+# Archivos de prueba de coverage
+coverage/
